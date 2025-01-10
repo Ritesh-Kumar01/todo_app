@@ -1,3 +1,5 @@
+from tabulate import tabulate
+from colorama import Fore,Style
 from utilts import line
 from db import get_connection
 from crud import view_task,view_single_task,add_task,update_task,delete_task
@@ -17,8 +19,23 @@ def match_cases(user_input):
             print("View task")
             rows = view_task()
             if rows:
+                head = ["TodoId", "Todo Name","Todo Desc","CreatedAt","Status"]
+                # applying color over status 
+                colored_row = []
                 for row in rows:
-                    print(f"Task ID: {row[0]}, Name: {row[1]}, Description: {row[2]}, Status: {row[4]}")
+                    status = row[4]
+                    if status.lower() == "completed":
+                        colored_status = f"{Fore.GREEN}{status}{Style.RESET_ALL}"
+                    else:
+                        colored_status = f"{Fore.RED}{status}{Style.RESET_ALL}"
+                    
+                    new_row = list(row[:4]) + [colored_status]
+                    colored_row.append(new_row)
+
+                # priniting table
+                print(tabulate(colored_row, headers=head, tablefmt="grid"))
+
+
             else:
                 print("No Task found.")
 
@@ -40,7 +57,8 @@ def match_cases(user_input):
             # adding new data
             new_task_name = input("Enter your new task name : ")
             new_task_desc = input("Enter your new task desc : ")
-            rowcount = update_task(new_task_name,new_task_desc,row[0])
+            new_task_status = int(input("Choose 0 for Not Completed and 1 for Completed : "))
+            rowcount = update_task(row[0],new_task_name,new_task_desc,new_task_status)
             if rowcount == 0:
                 print("No task found with the given ID.")
             else:

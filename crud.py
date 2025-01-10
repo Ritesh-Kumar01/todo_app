@@ -26,15 +26,19 @@ def add_task(task_name,task_desc,status="Not Completed"):
     """, (task_name, task_desc,status))
     con.commit()
 
-def update_task(task_id, new_name, new_desc, new_status="Not Completed"):
+def update_task(task_id, new_name, new_desc, new_status=0):
     con = get_connection()
     cur = con.cursor()
-    
+    if new_status == 1:
+        status = "Completed"
+    else:
+        status = "Not Completed"
+
     cur.execute("""
         UPDATE todo
         SET todo_name = ?, todo_desc = ?, status = ?
         WHERE todoID = ?
-    """, (new_name, new_desc, new_status, task_id))
+    """, (new_name, new_desc, status, task_id))
     
     row =  cur.rowcount
     
